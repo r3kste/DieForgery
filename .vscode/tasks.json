@@ -6,10 +6,12 @@
             "command": "/usr/bin/g++",
             "args": [
                 "-fdiagnostics-color=always",
+                "-Wall",
+                "-O2",
                 "-g",
                 "${file}",
                 "-o",
-                "${fileDirname}/${fileBasenameNoExtension}"
+                "${workspaceFolder}/a.out"
             ],
             "options": {
                 "cwd": "${fileDirname}"
