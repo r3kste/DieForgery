@@ -1,38 +1,26 @@
 #include <iostream>
 #include <chrono>
-#include <cmath>
 #include <fstream>
+#include <cstdint>
+#include <map>
+#include "lfsr.hpp"
+int main() {
+    std::ofstream output_file("output.txt");
+    std::ofstream gnu_plot("gnuplot.txt");
+    DiceForge::LFSR<u_int64_t> rng(1);
+    std::map<const unsigned long long int, long long int> freq;
+    // output_file.precision(17);
 
-using namespace std;
-
-long long int lfsr_once()
-{
-    unsigned long long int curr = chrono::high_resolution_clock::now().time_since_epoch().count();
-    long long int rand_num = 0;
-    bool new_bit;
-
-    new_bit = ((curr ^ (curr >> 7) ^ (curr << 9) ^ (curr >> 13))) & 1;
-    // rand_num = (rand_num + (long double)new_bit) / 2;
-    rand_num = rand_num * 2 + new_bit;
-    curr = (curr >> 1) | (curr << 63);
-
-    for (int i = 1; i < 4; i++)
-    {
-        new_bit = ((curr ^ (curr >> 7) ^ (curr << 9) ^ (curr >> 13))) & 1;
-        // rand_num = (rand_num + (long double)new_bit) / 2;
-        rand_num = rand_num * 2 + new_bit;
-        curr = (curr >> 1) | (curr << 63);
+    for (int i = 0; i < 1000000; i++) {
+        auto rand_num = rng.random();
+        output_file << rand_num << '\n';
+        freq[rand_num]++;
     }
-    return rand_num;
-}
 
-int main()
-{
-    ofstream MyFile("output.txt");
-    for (int i = 0; i < 1000000; i++)
-    {
-        MyFile << lfsr_once() << '\n';
-        // printf("%lld\n", lfsr_once());
+    for (auto &i : freq) {
+        gnu_plot << i.first << " " << i.second << '\n';
     }
-    MyFile.close();
+
+    gnu_plot.close();
+    output_file.close();
 }
